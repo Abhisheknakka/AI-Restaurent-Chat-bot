@@ -53,3 +53,11 @@ docker run -it \
     docker.elastic.co/elasticsearch/elasticsearch:8.4.3
 ```
 
+
+required Libraries:
+
+pip install openai
+pip install streamlit
+pip install python-loadenv
+pip install elasticsearch
+
