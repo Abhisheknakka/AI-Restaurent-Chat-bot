@@ -72,7 +72,7 @@
         "field_id": 12
     },
     {
-        "section": "rating",
+        "section": "review",
         "field": "review",
         "question": "Can you provide a review?",
         "field_id": 13

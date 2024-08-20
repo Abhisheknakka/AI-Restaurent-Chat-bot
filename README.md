@@ -28,3 +28,28 @@ scripts/: Contains scripts to generate and expand the dataset.
 generate_additional_questions.py: Python script to generate additional questions using the OpenAI API based on the answers provided in the dataset.
 create_gold_standard.py: Python script to create a gold standard dataset from the existing data.
 README.md: This file, providing an overview of the project and instructions for use.
+
+## Things to change before implementing this project
+
+1. Create a .env file with LLM api key in it. I used both chatgpt and groq to generate the response
+
+Format I used inside the .env file is 
+example: 
+OPEN_API_KEY = "sdlasmalcma"
+GROQ_API_KEY = ""
+
+2. Create a elasticsearch in docker
+
+Running ElasticSearch:
+```
+docker run -it \
+    --rm \
+    --name elasticsearch \
+    -m 4GB \
+    -p 9200:9200 \
+    -p 9300:9300 \
+    -e "discovery.type=single-node" \
+    -e "xpack.security.enabled=false" \
+    docker.elastic.co/elasticsearch/elasticsearch:8.4.3
+```
+

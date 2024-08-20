@@ -2,7 +2,7 @@ import json
 import pandas as pd
 
 # Read menu items from CSV
-menu_items_df = pd.read_csv('dish_data.csv')
+menu_items_df = pd.read_csv('cakes_data.csv')
 
 # Read questions from JSON file
 with open('user_questions.json', 'r') as f:
