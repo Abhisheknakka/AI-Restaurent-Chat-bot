@@ -56,5 +56,5 @@ docker run -it \
 
 required Libraries:
 
-pip install openai streamlit python-loadenv elasticsearch
+pip install openai streamlit python-loadenv elasticsearch sentence_transformers
 

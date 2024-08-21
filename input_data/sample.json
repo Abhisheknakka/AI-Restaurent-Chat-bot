@@ -1,0 +1,142 @@
+[
+  {
+    "dish name": "almond fudge banana cake",
+    "documents": [
+      {
+        "question": "What are the ingredients in this dish?",
+        "section": "Ingredients",
+        "text": "The almond fudge banana cake contains ['dole banana', 'sugar', 'margarine', 'eggs', 'amaretto liqueur', 'vanilla extract', 'all-purpose flour', 'unsweetened cocoa powder', 'baking soda', 'salt', 'dole almond']"
+      },
+      {
+        "question": "How many calories does this dish have?",
+        "section": "Nutritional Information",
+        "text": "The almond fudge banana cake contains 224.8"
+      },
+      {
+        "question": "What is the total fat content in this dish?",
+        "section": "Nutritional Information",
+        "text": "The almond fudge banana cake contains 14"
+      },
+      {
+        "question": "How much sugar is in this dish?",
+        "section": "Nutritional Information",
+        "text": "The almond fudge banana cake contains 87"
+      },
+      {
+        "question": "How much protein is in this dish?",
+        "section": "Nutritional Information",
+        "text": "The almond fudge banana cake contains 7"
+      },
+      {
+        "question": "How many carbohydrates are in this dish?",
+        "section": "Nutritional Information",
+        "text": "The almond fudge banana cake contains 11"
+      },
+      {
+        "question": "Is this dish considered high in calories?",
+        "section": "Nutritional Information",
+        "text": "The almond fudge banana cake contains Low Calory"
+      },
+      {
+        "question": "How long does it take to prepare this dish?",
+        "section": "Preparation Time",
+        "text": "The almond fudge banana cake contains 110"
+      },
+      {
+        "question": "How would you describe the taste of this dish?",
+        "section": "Review",
+        "text": "The almond fudge banana cake contains Came out great for a chocolate Easter cake. I made an almond cream cheese frosting instead of a chocolate glaze to make it more Spring-like. Very moist and the banana is definately the strongest flavor coming from the cake. Will definately make again."
+      },
+      {
+        "question": "What is the rating of this dish?",
+        "section": "Rating",
+        "text": "The almond fudge banana cake contains 4"
+      },
+      {
+        "question": "How many ingredients are in this dish?",
+        "section": "Number of Ingredients",
+        "text": "The almond fudge banana cake contains 11"
+      },
+      {
+        "question": "How much does this dish cost?",
+        "section": "Price",
+        "text": "The almond fudge banana cake contains 24"
+      },
+      {
+        "question": "What is the rating category of this dish?",
+        "section": "Rating Category",
+        "text": "The almond fudge banana cake contains tasty"
+      }
+    ]
+  },
+  {
+    "dish name": "apple pie cake",
+    "documents": [
+      {
+        "question": "What are the ingredients in this dish?",
+        "section": "Ingredients",
+        "text": "The apple pie cake contains ['sugar', 'egg', 'salt', 'butter', 'flour', 'baking powder', 'cinnamon', 'nutmeg', 'vanilla', 'baking apples', 'pecans', 'golden raisin']"
+      },
+      {
+        "question": "How many calories does this dish have?",
+        "section": "Nutritional Information",
+        "text": "The apple pie cake contains 359.1"
+      },
+      {
+        "question": "What is the total fat content in this dish?",
+        "section": "Nutritional Information",
+        "text": "The apple pie cake contains 26"
+      },
+      {
+        "question": "How much sugar is in this dish?",
+        "section": "Nutritional Information",
+        "text": "The apple pie cake contains 136"
+      },
+      {
+        "question": "How much protein is in this dish?",
+        "section": "Nutritional Information",
+        "text": "The apple pie cake contains 7"
+      },
+      {
+        "question": "How many carbohydrates are in this dish?",
+        "section": "Nutritional Information",
+        "text": "The apple pie cake contains 16"
+      },
+      {
+        "question": "Is this dish considered high in calories?",
+        "section": "Nutritional Information",
+        "text": "The apple pie cake contains Low Calory"
+      },
+      {
+        "question": "How long does it take to prepare this dish?",
+        "section": "Preparation Time",
+        "text": "The apple pie cake contains 40"
+      },
+      {
+        "question": "How would you describe the taste of this dish?",
+        "section": "Review",
+        "text": "The apple pie cake contains The flavor of this was good, but the making of it didn't go very well.  There were a lot of steps, which isn't necessarily a  bad thing, but it didn't fall together like most cake recipes.  For example, I couldn't figure out why I had to melt the butter (and of course cool it) when I was just creaming it, or why add the sugar in two parts.   I had tons of tunnels.  And it would be helpful if there was a number for how long to bake.  At least a range, especially for us novice cooks.   It took 45 minutes for me."
+      },
+      {
+        "question": "What is the rating of this dish?",
+        "section": "Rating",
+        "text": "The apple pie cake contains 3"
+      },
+      {
+        "question": "How many ingredients are in this dish?",
+        "section": "Number of Ingredients",
+        "text": "The apple pie cake contains 12"
+      },
+      {
+        "question": "How much does this dish cost?",
+        "section": "Price",
+        "text": "The apple pie cake contains 20"
+      },
+      {
+        "question": "What is the rating category of this dish?",
+        "section": "Rating Category",
+        "text": "The apple pie cake contains so so"
+      }
+    ]
+  }
+]
