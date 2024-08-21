@@ -56,8 +56,5 @@ docker run -it \
 
 required Libraries:
 
-pip install openai
-pip install streamlit
-pip install python-loadenv
-pip install elasticsearch
+pip install openai streamlit python-loadenv elasticsearch
 
