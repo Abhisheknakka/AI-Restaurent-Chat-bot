@@ -15,6 +15,7 @@ openai_api_key = os.getenv("OPENAI_API_KEY")
 client = OpenAI(api_key=openai_api_key)
 es_client = Elasticsearch('http://localhost:9200') 
 
+
 def elastic_search(query):
 
     search_query = {
