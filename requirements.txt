@@ -1,0 +1,8 @@
+#pip install - requirements.txt
+
+openai
+python-dotenv
+elasticsearch
+groq
+tiktoken
+gensim

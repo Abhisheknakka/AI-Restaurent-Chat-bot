@@ -60,8 +60,23 @@ def build_prompt(query, search_results):
 def llm(prompt):
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
-        messages=[{"role": "user", "content": prompt}]
+        messages=[
+            {"role": "user", "content": prompt}
+            
+            ]
     )
+
+    """
+
+    # test this
+    response = client.chat.completions.create(
+    model=MODEL_NAME,
+    temperature=0.3,
+    messages=[
+        {"role": "system", "content": SYSTEM_MESSAGE},
+        {"role": "user", "content": USER_MESSAGE + "\nSources: " + matches_table},
+    ],)
+    """
     
     return response.choices[0].message.content
 

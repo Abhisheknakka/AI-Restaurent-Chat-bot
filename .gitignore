@@ -4,6 +4,9 @@ __pycache__/
 *$py.class
 
 .env
+.env.openai
+.env.ollama
+.env.groq
 
 # C extensions
 *.so
