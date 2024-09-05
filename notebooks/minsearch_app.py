@@ -42,7 +42,7 @@ prompt_template = """
 """
 def build_prompt(query, search_results):
     prompt_template = """
-    You are a highly trained professional and helpful assistant that answers questions about cars based off a menu data set.
+    You are a highly trained professional and helpful assistant that answers questions about food based off a menu data set.
     You must use the data set to answer the questions, you should not provide any info that is not in the provided sources.
     Answer the questions which user asks based on the  CONTEXT.
     Use only facts from the CONTEXT when answering the QUESTION.
