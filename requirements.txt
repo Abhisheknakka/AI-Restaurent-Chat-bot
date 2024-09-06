@@ -8,3 +8,4 @@ tiktoken
 genism
 -U sentence-transformers
 faiss-cpu
+pgcli

@@ -16,8 +16,6 @@ def create_entry(menu_item):
     documents = []
     for q in questions:
         field_value = menu_item.get(q['field'], "N/A")
-        field_id = menu_item.get(q['field_id'], "N/A")
-
         
         # Customize the text based on the section and question
         if q['section'] == 'ingredients':
