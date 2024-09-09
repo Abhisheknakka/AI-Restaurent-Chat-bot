@@ -9,8 +9,31 @@ import json
 load_dotenv()
 
 # Retrieve the API key from the environment
-openai_api_key = os.getenv("OPENAI_API_KEY")
-client = OpenAI(api_key=openai_api_key)
+# Setup the OpenAI client to use either Groq, OpenAI.com, or Ollama API
+load_dotenv(override=True)
+API_HOST = os.getenv("API_HOST")
+API_HOST
+
+if API_HOST == "groq":
+    client = client = Groq(
+    api_key=os.environ.get("GROQ_API_KEY"),
+)
+    MODEL_NAME = os.getenv("GROQ_MODEL")
+
+elif API_HOST == "ollama":
+    client = openai.OpenAI(
+        base_url=os.getenv("OLLAMA_ENDPOINT"),
+        api_key="nokeyneeded",
+    )
+    MODEL_NAME = os.getenv("OLLAMA_MODEL")
+
+elif API_HOST == "github":
+    client = openai.OpenAI(base_url="https://models.inference.ai.azure.com", api_key=os.getenv("GITHUB_TOKEN"))
+    MODEL_NAME = os.getenv("GITHUB_MODEL")
+
+else:
+    client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    MODEL_NAME = os.getenv("OPENAI_MODEL")
 
 
 base_folder = 'D:/Projects/AI-Restaurent-Chat-bot/'

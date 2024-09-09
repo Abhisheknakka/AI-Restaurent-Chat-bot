@@ -1,96 +1,43 @@
+# Import necessary libraries
+import json
 import pandas as pd
+import openai
+import elasticsearch
+from groq import Groq
+from dotenv import load_dotenv
+import os
+from sklearn.feature_extraction.text import CountVectorizer
+from tqdm.auto import tqdm
+import minsearch
 
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
 
-import numpy as np
+# Load environment variables
+load_dotenv()
+
+# Setup project paths
+base_folder = 'D:/Projects/AI-Restaurent-Chat-bot/'
+input_data_folder = base_folder + 'input_data/'
 
 
-class Index:
-    """
-    A simple search index using TF-IDF and cosine similarity for text fields and exact matching for keyword fields.
+def load_index():
 
-    Attributes:
-        text_fields (list): List of text field names to index.
-        keyword_fields (list): List of keyword field names to index.
-        vectorizers (dict): Dictionary of TfidfVectorizer instances for each text field.
-        keyword_df (pd.DataFrame): DataFrame containing keyword field data.
-        text_matrices (dict): Dictionary of TF-IDF matrices for each text field.
-        docs (list): List of documents indexed.
-    """
+    with open(input_data_folder + 'food_user_qa_dataset.json', 'rt') as f_in:
+        data = json.load(f_in)
 
-    def __init__(self, text_fields, keyword_fields, vectorizer_params={}):
-        """
-        Initializes the Index with specified text and keyword fields.
+    documents = []
+    for dish in data['dishes']:
+        dish_name = dish['dish name']
+        for doc in dish['documents']:
+            doc['dish_name'] = dish_name  # Add dish_name to each document
+            documents.append(doc)
 
-        Args:
-            text_fields (list): List of text field names to index.
-            keyword_fields (list): List of keyword field names to index.
-            vectorizer_params (dict): Optional parameters to pass to TfidfVectorizer.
-        """
-        self.text_fields = text_fields
-        self.keyword_fields = keyword_fields
+    index = minsearch.Index(
+    text_fields = ['id', 'question','section','text','dish_name'],
+    keyword_fields=['dish_name']
+    #keyword_fields=['id']
+    )
 
-        self.vectorizers = {field: TfidfVectorizer(**vectorizer_params) for field in text_fields}
-        self.keyword_df = None
-        self.text_matrices = {}
-        self.docs = []
+    index.fit(documents)
+    return index
 
-    def fit(self, docs):
-        """
-        Fits the index with the provided documents.
 
-        Args:
-            docs (list of dict): List of documents to index. Each document is a dictionary.
-        """
-        self.docs = docs
-        keyword_data = {field: [] for field in self.keyword_fields}
-
-        for field in self.text_fields:
-            texts = [doc.get(field, '') for doc in docs]
-            self.text_matrices[field] = self.vectorizers[field].fit_transform(texts)
-
-        for doc in docs:
-            for field in self.keyword_fields:
-                keyword_data[field].append(doc.get(field, ''))
-
-        self.keyword_df = pd.DataFrame(keyword_data)
-
-        return self
-
-    def search(self, query, filter_dict={}, boost_dict={}, num_results=10):
-        """
-        Searches the index with the given query, filters, and boost parameters.
-
-        Args:
-            query (str): The search query string.
-            filter_dict (dict): Dictionary of keyword fields to filter by. Keys are field names and values are the values to filter by.
-            boost_dict (dict): Dictionary of boost scores for text fields. Keys are field names and values are the boost scores.
-            num_results (int): The number of top results to return. Defaults to 10.
-
-        Returns:
-            list of dict: List of documents matching the search criteria, ranked by relevance.
-        """
-        query_vecs = {field: self.vectorizers[field].transform([query]) for field in self.text_fields}
-        scores = np.zeros(len(self.docs))
-
-        # Compute cosine similarity for each text field and apply boost
-        for field, query_vec in query_vecs.items():
-            sim = cosine_similarity(query_vec, self.text_matrices[field]).flatten()
-            boost = boost_dict.get(field, 1)
-            scores += sim * boost
-
-        # Apply keyword filters
-        for field, value in filter_dict.items():
-            if field in self.keyword_fields:
-                mask = self.keyword_df[field] == value
-                scores = scores * mask.to_numpy()
-
-        # Use argpartition to get top num_results indices
-        top_indices = np.argpartition(scores, -num_results)[-num_results:]
-        top_indices = top_indices[np.argsort(-scores[top_indices])]
-
-        # Filter out zero-score results
-        top_docs = [self.docs[i] for i in top_indices if scores[i] > 0]
-
-        return top_docs

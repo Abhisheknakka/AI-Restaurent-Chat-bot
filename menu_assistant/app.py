@@ -1,96 +1,78 @@
-import pandas as pd
+import streamlit as st
+from fastapi import FastAPI, Request
+from pydantic import BaseModel
+import time
+import uuid  # For generating conversation IDs
+from dotenv import load_dotenv
+import os
+from rag import rag  # Importing the rag function from your rag.py file
 
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
+# Load environment variables
+load_dotenv()
 
-import numpy as np
+# Initialize FastAPI app
+app = FastAPI()
 
+# Endpoint model for `/ask`
+class AskRequest(BaseModel):
+    question: str
 
-class Index:
-    """
-    A simple search index using TF-IDF and cosine similarity for text fields and exact matching for keyword fields.
+# Endpoint model for `/feedback`
+class FeedbackRequest(BaseModel):
+    conversation_id: str
+    feedback: int  # Can be either +1 or -1
 
-    Attributes:
-        text_fields (list): List of text field names to index.
-        keyword_fields (list): List of keyword field names to index.
-        vectorizers (dict): Dictionary of TfidfVectorizer instances for each text field.
-        keyword_df (pd.DataFrame): DataFrame containing keyword field data.
-        text_matrices (dict): Dictionary of TF-IDF matrices for each text field.
-        docs (list): List of documents indexed.
-    """
+# Create a dictionary to store conversation history
+conversation_history = {}
 
-    def __init__(self, text_fields, keyword_fields, vectorizer_params={}):
-        """
-        Initializes the Index with specified text and keyword fields.
+# FastAPI route for handling question POST request
+@app.post("/ask")
+async def ask_question(req: AskRequest):
+    question = req.question
+    conversation_id = str(uuid.uuid4())  # Generate unique conversation ID
+    
+    # Call the rag function to get the answer
+    answer = rag(question)
 
-        Args:
-            text_fields (list): List of text field names to index.
-            keyword_fields (list): List of keyword field names to index.
-            vectorizer_params (dict): Optional parameters to pass to TfidfVectorizer.
-        """
-        self.text_fields = text_fields
-        self.keyword_fields = keyword_fields
+    # Store conversation history (you can store this in a database later)
+    conversation_history[conversation_id] = {
+        "question": question,
+        "answer": answer
+    }
 
-        self.vectorizers = {field: TfidfVectorizer(**vectorizer_params) for field in text_fields}
-        self.keyword_df = None
-        self.text_matrices = {}
-        self.docs = []
+    # Return the answer along with the conversation ID
+    return {
+        "conversation_id": conversation_id,
+        "answer": answer
+    }
 
-    def fit(self, docs):
-        """
-        Fits the index with the provided documents.
+# FastAPI route for handling feedback POST request
+@app.post("/feedback")
+async def give_feedback(req: FeedbackRequest):
+    conversation_id = req.conversation_id
+    feedback = req.feedback
+    
+    # For now, just acknowledge the feedback
+    if conversation_id in conversation_history:
+        # Process the feedback (for example, write to a database in the future)
+        return {"status": "Feedback received", "conversation_id": conversation_id, "feedback": feedback}
+    else:
+        return {"error": "Conversation ID not found"}
 
-        Args:
-            docs (list of dict): List of documents to index. Each document is a dictionary.
-        """
-        self.docs = docs
-        keyword_data = {field: [] for field in self.keyword_fields}
+# Streamlit UI
+def main():
+    st.image(r"D:\Projects\AI-Restaurent-Chat-bot\input_data\jack_menu\logo.jpg", width=500)
 
-        for field in self.text_fields:
-            texts = [doc.get(field, '') for doc in docs]
-            self.text_matrices[field] = self.vectorizers[field].fit_transform(texts)
+    st.title("Jacks Chat Application")
 
-        for doc in docs:
-            for field in self.keyword_fields:
-                keyword_data[field].append(doc.get(field, ''))
+    user_input = st.text_input("Chatbot is ready to help with menu. Ask your questions:")
 
-        self.keyword_df = pd.DataFrame(keyword_data)
+    if st.button("Ask"):
+        with st.spinner('Processing...'):
+            response = rag(user_input)  # Call rag function
+            st.success("Completed!")
+            st.write(response)
 
-        return self
-
-    def search(self, query, filter_dict={}, boost_dict={}, num_results=10):
-        """
-        Searches the index with the given query, filters, and boost parameters.
-
-        Args:
-            query (str): The search query string.
-            filter_dict (dict): Dictionary of keyword fields to filter by. Keys are field names and values are the values to filter by.
-            boost_dict (dict): Dictionary of boost scores for text fields. Keys are field names and values are the boost scores.
-            num_results (int): The number of top results to return. Defaults to 10.
-
-        Returns:
-            list of dict: List of documents matching the search criteria, ranked by relevance.
-        """
-        query_vecs = {field: self.vectorizers[field].transform([query]) for field in self.text_fields}
-        scores = np.zeros(len(self.docs))
-
-        # Compute cosine similarity for each text field and apply boost
-        for field, query_vec in query_vecs.items():
-            sim = cosine_similarity(query_vec, self.text_matrices[field]).flatten()
-            boost = boost_dict.get(field, 1)
-            scores += sim * boost
-
-        # Apply keyword filters
-        for field, value in filter_dict.items():
-            if field in self.keyword_fields:
-                mask = self.keyword_df[field] == value
-                scores = scores * mask.to_numpy()
-
-        # Use argpartition to get top num_results indices
-        top_indices = np.argpartition(scores, -num_results)[-num_results:]
-        top_indices = top_indices[np.argsort(-scores[top_indices])]
-
-        # Filter out zero-score results
-        top_docs = [self.docs[i] for i in top_indices if scores[i] > 0]
-
-        return top_docs
+# Ensure that the FastAPI and Streamlit apps run correctly
+if __name__ == "__main__":
+    main()

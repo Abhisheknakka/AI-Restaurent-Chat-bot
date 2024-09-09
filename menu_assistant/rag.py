@@ -3,35 +3,53 @@ import time
 from dotenv import load_dotenv
 import os
 from openai import OpenAI
+from groq import Groq
 import minsearch
 import json
 # Load environment variables
 load_dotenv()
 
-# Retrieve the API key from the environment
-openai_api_key = os.getenv("OPENAI_API_KEY")
-client = OpenAI(api_key=openai_api_key)
 
+# Setup the OpenAI client to use either Groq, OpenAI.com, or Ollama API
+load_dotenv(override=True)
+API_HOST = os.getenv("API_HOST")
+API_HOST
 
-base_folder = 'D:/Projects/AI-Restaurent-Chat-bot/'
-input_data_folder = base_folder+'input_data/'
+if API_HOST == "groq":
+    client = Groq(api_key=os.getenv('GROQ_API_KEY'))
+    MODEL_NAME = os.getenv("GROQ_MODEL")
 
-with open(input_data_folder + 'food_user_qa_dataset.json', 'rt') as f_in:
-    data = json.load(f_in)
-
-documents = []
-
-for dish in data['dishes']:
-    dish_name = dish['dish name']
-    for doc in dish['documents']:
-        doc['dish_name'] = dish_name  # Add dish_name to each document
-        documents.append(doc)
-index = minsearch.Index(
-    text_fields = ['id', 'question','section','text','dish_name'],
-    keyword_fields=['dish_name']
+elif API_HOST == "ollama":
+    client = openai.OpenAI(
+        base_url=os.getenv("OLLAMA_ENDPOINT"),
+        api_key="nokeyneeded",
     )
+    MODEL_NAME = os.getenv("OLLAMA_MODEL")
 
-index.fit(documents)
+elif API_HOST == "github":
+    client = openai.OpenAI(base_url="https://models.inference.ai.azure.com", api_key=os.getenv("GITHUB_TOKEN"))
+    MODEL_NAME = os.getenv("GITHUB_MODEL")
+
+else:
+    client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    MODEL_NAME = os.getenv("OPENAI_MODEL")
+
+
+import ingest
+index =ingest.load_index()
+
+
+"""
+def search(query):
+    boost ={}
+
+    results = index.search(
+        query = query,
+        filter_dict = {}
+        boost_dict = boost,
+        num_results = 10
+    )
+"""
 
 def minsearch(query):
     return index.search(query)
@@ -49,35 +67,25 @@ def build_prompt(query, search_results):
     
     prompt = prompt_template.format(question=query, context=context).strip()
     return prompt
+import asyncio
 
+
+import asyncio
+
+# Make llm an async function to be awaited
 def llm(prompt):
     response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model=MODEL_NAME,
         messages=[{"role": "user", "content": prompt}]
     )
-    
     return response.choices[0].message.content
 
+
+# Modify rag function to call the async llm function using asyncio.run
 def rag(query):
     search_results = minsearch(query)
     prompt = build_prompt(query, search_results)
-    answer = llm(prompt)
+    answer = llm(prompt)  # Direct call, no async handling
     return answer
 
 
-def main():
-
-    st.image(r"D:\Projects\AI-Restaurent-Chat-bot\input_data\jack_menu\logo.jpg", width=500)
-
-    st.title("Jacks Chat Application") 
-
-    user_input = st.text_input("Chatbot is ready to help with menu. Ask your questions:")
-
-    if st.button("Ask"):
-        with st.spinner('Processing...'):
-            output = rag(user_input)
-            st.success("Completed!")
-            st.write(output)
-
-if __name__ == "__main__":
-    main()
