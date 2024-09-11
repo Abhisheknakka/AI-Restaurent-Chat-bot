@@ -1,17 +1,35 @@
-import streamlit as st
-from fastapi import FastAPI, Request
-from pydantic import BaseModel
-import time
-import uuid  # For generating conversation IDs
-from dotenv import load_dotenv
-import os
-from rag import rag  # Importing the rag function from your rag.py file
+from fastapi import FastAPI, Depends
+from sqlalchemy import create_engine, Column, Integer, String, Text
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
-# Load environment variables
-load_dotenv()
+# Database setup
+DATABASE_URL = "postgresql://postgres:mysecretpassword@localhost/postgres"
+engine = create_engine(DATABASE_URL)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()
 
-# Initialize FastAPI app
+# Model for storing conversations
+class Conversation(Base):
+    __tablename__ = "conversations"
+    id = Column(Integer, primary_key=True, index=True)
+    conversation_id = Column(String, index=True)
+    question = Column(Text)
+    answer = Column(Text)
+
+Base.metadata.create_all(bind=engine)
+
+# Dependency for database session
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+# FastAPI app initialization
 app = FastAPI()
+
 
 # Endpoint model for `/ask`
 class AskRequest(BaseModel):
@@ -22,42 +40,48 @@ class FeedbackRequest(BaseModel):
     conversation_id: str
     feedback: int  # Can be either +1 or -1
 
-# Create a dictionary to store conversation history
+from pydantic import BaseModel
+import uuid
+
+class AskRequest(BaseModel):
+    question: str
+
+class FeedbackRequest(BaseModel):
+    conversation_id: str
+    feedback: int  # Can be either +1 or -1
+
+# Create a dictionary to store conversation history (for testing purposes)
 conversation_history = {}
 
-# FastAPI route for handling question POST request
 @app.post("/ask")
-async def ask_question(req: AskRequest):
+async def ask_question(req: AskRequest, db: Session = Depends(get_db)):
     question = req.question
     conversation_id = str(uuid.uuid4())  # Generate unique conversation ID
-    
+
     # Call the rag function to get the answer
     answer = rag(question)
 
-    # Store conversation history (you can store this in a database later)
-    conversation_history[conversation_id] = {
-        "question": question,
-        "answer": answer
-    }
+    # Store conversation history in database
+    db.add(Conversation(conversation_id=conversation_id, question=question, answer=answer))
+    db.commit()
 
-    # Return the answer along with the conversation ID
     return {
         "conversation_id": conversation_id,
         "answer": answer
     }
 
-# FastAPI route for handling feedback POST request
 @app.post("/feedback")
-async def give_feedback(req: FeedbackRequest):
+async def give_feedback(req: FeedbackRequest, db: Session = Depends(get_db)):
     conversation_id = req.conversation_id
     feedback = req.feedback
-    
-    # For now, just acknowledge the feedback
-    if conversation_id in conversation_history:
-        # Process the feedback (for example, write to a database in the future)
+
+    # Process the feedback
+    conversation = db.query(Conversation).filter(Conversation.conversation_id == conversation_id).first()
+    if conversation:
         return {"status": "Feedback received", "conversation_id": conversation_id, "feedback": feedback}
     else:
         return {"error": "Conversation ID not found"}
+
 
 # Streamlit UI
 def main():

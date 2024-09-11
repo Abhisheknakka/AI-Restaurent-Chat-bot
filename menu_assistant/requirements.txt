@@ -1,0 +1,15 @@
+#pip install - requirements.txt
+
+openai
+python-dotenv
+groq
+tiktoken
+faiss-cpu
+pgcli
+asyncpg
+streamlit
+fastapi 
+uvicorn
+pydantic
+sqlalchemy
+psycopg2-binary
