@@ -3,6 +3,7 @@ import time
 from dotenv import load_dotenv
 import os
 from openai import OpenAI
+from groq import Groq
 import minsearch
 import json
 # Load environment variables
@@ -82,7 +83,7 @@ def build_prompt(query, search_results):
 
 def llm(prompt):
     response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model=MODEL_NAME,
         messages=[
             {"role": "user", "content": prompt}
             

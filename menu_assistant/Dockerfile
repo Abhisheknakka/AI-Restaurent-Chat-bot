@@ -15,3 +15,9 @@ EXPOSE 8501
 
 # Run the streamlit app
 CMD ["streamlit", "run", "app.py"]
+
+#Stop the docker
+#docker stop $(docker ps -q)
+
+#start the docker
+#docker start $(docker ps -a -q)

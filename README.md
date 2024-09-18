@@ -58,3 +58,7 @@ required Libraries:
 
 pip install openai streamlit python-loadenv elasticsearch sentence_transformers
 
+
+App 
+
+![alt text](image.png)
